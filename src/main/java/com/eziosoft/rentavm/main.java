@@ -18,12 +18,16 @@ public class main {
         System.out.println("web server started");
     }
 
+    public static String getPageFromResource(String name){
+        return new Scanner(main.class.getResourceAsStream(name), "UTF-8").useDelimiter("\\A").next();
+    }
+
     static class landing implements HttpHandler{
         public void handle(HttpExchange t) throws IOException{
-            String what = new Scanner(main.class.getResourceAsStream("/main.html"), "UTF-8").useDelimiter("\\A").next();
-            System.out.println(what);
+            String what = getPageFromResource("/main.html");
             t.sendResponseHeaders(200, what.length());
             t.getResponseBody().write(what.getBytes());
+
         }
     }
 
