@@ -2,14 +2,10 @@ package com.eziosoft.rentavm;
 
 import com.eziosoft.rentavm.objects.WebConf;
 import com.google.gson.Gson;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +50,7 @@ public class main {
         // start by making a httpserver instance
         HttpServer server = HttpServer.create(new InetSocketAddress("localhost", conf.getWebport()), 0);
         server.createContext("/", new Pages.landing());
-        server.createContext("/login", new Pages.login());
+        server.createContext("/login", new Pages.loginFolder());
         server.createContext("/api/dologin", new Pages.dologin());
         server.setExecutor(null);
         server.start();

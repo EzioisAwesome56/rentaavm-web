@@ -7,12 +7,33 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static com.eziosoft.rentavm.main.getPageFromResource;
 import static com.eziosoft.rentavm.main.queryToMap;
 
 public class Pages {
+
+    // function to send error pages to the client
+    private static void sendErrorPage(int errorcode, HttpExchange e) throws IOException {
+        String errorPage;
+        switch (errorcode){
+            case 404:
+                errorPage = getPageFromResource("/src/error/404.html");
+                break;
+            case 403:
+                errorPage = getPageFromResource("/src/error/403.html");
+                break;
+            default:
+                errorPage = "Error while processing error!";
+                break;
+        }
+        e.sendResponseHeaders(errorcode, errorPage.length());
+        e.getResponseBody().write(errorPage.getBytes(StandardCharsets.UTF_8));
+        // close the stream
+        e.getResponseBody().close();
+    }
 
     static class landing implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
@@ -22,16 +43,13 @@ public class Pages {
         }
     }
 
-    static class login implements HttpHandler{
+    static class loginFolder implements HttpHandler{
         public void handle(HttpExchange t) throws IOException{
             String filename = t.getRequestURI().getPath();
             //debug shit System.out.println(filename);
             // check if resource exists
             if (main.class.getResource("/src" + filename) == null){
-                String what = getPageFromResource("/404.html");
-                t.sendResponseHeaders(404, what.length());
-                t.getResponseBody().write(what.getBytes());
-                t.getResponseBody().close();
+                sendErrorPage(404, t);
                 return;
             }
             if (filename.equals("/login/")){
@@ -56,6 +74,17 @@ public class Pages {
             System.out.println(data.get("username"));
             t.sendResponseHeaders(200, data.get("username").length());
             t.getResponseBody().write(data.get("username").getBytes());
+        }
+    }
+
+    static class registerFolder implements HttpHandler{
+        public void handle(HttpExchange t) throws IOException{
+            // basically ripoff what we did for the login folder, but now for registrations!
+            String requestedDocument = t.getRequestURI().getPath();
+            if (Pages.class.getResource("/src" + requestedDocument) == null){
+                sendErrorPage(404, t);
+                return;
+            }
         }
     }
 }

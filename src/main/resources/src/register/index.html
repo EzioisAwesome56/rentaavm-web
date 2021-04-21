@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <style>
+            body { text-align: center; background: green;}
+            #box { background:grey; border: 2px solid black; width: 50%; margin: auto;}
+        </style>
+    </head>
+    <body>
+        <h1>codename rentavm registration page</h1><hr>
+        <div id="box">
+            <!--do cool things here or something idk-->
+            <h3>Please enter your information</h3><hr>
+            <form action="/api/doregister" method="POST">
+                <label>Username</label><br>
+                <input type="text" name="username"><br>
+                <label>Email</label><br>
+                <input type="email" name="email"><br>
+                <label>Password</label><br>
+                <input type="password" name="pass1"><br>
+                <label>Confirm Password</label><br>
+                <input type="password" name="pass2"><br>
+                <input type="submit" value="Create Account">
+            </form>
+        </div>
+    </body>
+</html>
