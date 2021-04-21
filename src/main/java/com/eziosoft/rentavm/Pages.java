@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpHandler;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Map;
 
@@ -18,13 +19,29 @@ public class Pages {
             String what = getPageFromResource("/src/main.html");
             t.sendResponseHeaders(200, what.length());
             t.getResponseBody().write(what.getBytes());
-
         }
     }
 
     static class login implements HttpHandler{
         public void handle(HttpExchange t) throws IOException{
-            String what = getPageFromResource("/src/login.html");
+            String filename = t.getRequestURI().getPath();
+            System.out.println(filename);
+            // check if resource exists
+            URL u = main.class.getResource("/src" + filename);
+            if (u == null){
+                String what = getPageFromResource("/404.html");
+                t.sendResponseHeaders(404, what.length());
+                t.getResponseBody().write(what.getBytes());
+                return;
+            }
+            if (filename.equals("/login/")){
+                // return index.html
+                String what = getPageFromResource("/src"+filename+"index.html");
+                t.sendResponseHeaders(200, what.length());
+                t.getResponseBody().write(what.getBytes());
+                return;
+            }
+            String what = getPageFromResource("/src"+filename);
             t.sendResponseHeaders(200, what.length());
             t.getResponseBody().write(what.getBytes());
         }
