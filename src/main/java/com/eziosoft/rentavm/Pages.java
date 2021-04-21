@@ -25,7 +25,7 @@ public class Pages {
     static class login implements HttpHandler{
         public void handle(HttpExchange t) throws IOException{
             String filename = t.getRequestURI().getPath();
-            System.out.println(filename);
+            //debug shit System.out.println(filename);
             // check if resource exists
             if (main.class.getResource("/src" + filename) == null){
                 String what = getPageFromResource("/404.html");
