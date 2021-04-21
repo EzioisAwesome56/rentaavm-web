@@ -66,4 +66,8 @@ public class Database {
     public static User getUser(String username){
         return gson.fromJson(r.table(user).get(username).toJson().run(thonk, String.class).first(), User.class);
     }
+
+    public static void deleteSession(String token){
+        r.table(session).get(token).delete().run(thonk);
+    }
 }

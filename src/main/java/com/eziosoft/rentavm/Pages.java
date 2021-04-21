@@ -106,6 +106,19 @@ public class Pages {
         }
     }
 
+    static class doLogout implements HttpHandler{
+        public void handle(HttpExchange e) throws IOException {
+            if (e.getRequestHeaders().get("Cookie") == null){
+                sendErrorPage(403, e);
+                return;
+            }
+            String token = e.getRequestHeaders().get("Cookie").get(0).split("=")[1];
+            Database.deleteSession(token);
+            sendErrorPage(586, e);
+            return;
+        }
+    }
+
     static class doRegister implements HttpHandler{
         public void handle(HttpExchange e) throws IOException {
             // get post data
