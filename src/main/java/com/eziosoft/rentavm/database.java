@@ -13,7 +13,7 @@ public class database {
     public static void DatabaseInit(){
         System.out.println("Eziosoft Rentavm database driver starting up...");
         // build connection
-        Connection.Builder builder = r.connection().hostname("h").port(28015);
+        Connection.Builder builder = r.connection().hostname(main.conf.getDbip()).port(main.conf.getDbport());
         thonk = builder.connect();
 
         // basically lifted from Dankcord: check to see if our database actually friggin exists
@@ -23,6 +23,7 @@ public class database {
             r.dbCreate("rentavm").run(thonk);
             r.db("rentavm").tableCreate("session").optArg("primary_key", "token").run(thonk);
             r.db("rentavm").tableCreate("users").optArg("primary_key", "username").run(thonk);
+            r.db("rentavm").tableCreate("Vms").optArg("primary_key", "vmid").run(thonk);
             // some other third thing we might store in the database later idk
             //r.db("rentavm").tableCreate("auth").optArg("primary_key", "username").run(thonk);
             System.out.println("Database created!");

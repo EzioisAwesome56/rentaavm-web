@@ -46,8 +46,13 @@ public class main {
             conf = g.fromJson(br, WebConf.class);
             br.close();
         }
+        // do we init the db?
+        if (dbEnabled){
+            database.DatabaseInit();
+        }
+
         // start by making a httpserver instance
-        HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 6969), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress("localhost", conf.getWebport()), 0);
         server.createContext("/", new Pages.landing());
         server.createContext("/login", new Pages.login());
         server.createContext("/api/dologin", new Pages.dologin());
