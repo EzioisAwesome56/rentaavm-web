@@ -29,7 +29,7 @@ public class Pages {
     // function to send error pages to the client
     private static void sendErrorPage(int errorcode, HttpExchange e) throws IOException {
         String errorPage = getPageFromResource("/src/error/" + Integer.toString(errorcode) + ".html");
-        e.sendResponseHeaders(200, errorPage.length());
+        e.sendResponseHeaders(errorcode, errorPage.length());
         e.getResponseBody().write(errorPage.getBytes(StandardCharsets.UTF_8));
         // close the stream
         e.getResponseBody().close();
