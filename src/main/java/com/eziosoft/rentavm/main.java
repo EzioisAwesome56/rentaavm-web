@@ -52,6 +52,7 @@ public class main {
         server.createContext("/", new Pages.landing());
         server.createContext("/login", new Pages.loginFolder());
         server.createContext("/api/dologin", new Pages.dologin());
+        server.createContext("/register", new Pages.registerFolder());
         server.setExecutor(null);
         server.start();
         System.out.println("web server started");

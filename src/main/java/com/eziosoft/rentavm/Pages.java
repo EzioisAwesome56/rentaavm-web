@@ -85,6 +85,18 @@ public class Pages {
                 sendErrorPage(404, t);
                 return;
             }
+            if (requestedDocument.equals("/register/")){
+                // return index.html
+                requestedDocument = getPageFromResource("/src" + requestedDocument + "index.html");
+                t.sendResponseHeaders(200, requestedDocument.length());
+                t.getResponseBody().write(requestedDocument.getBytes(StandardCharsets.UTF_8));
+                t.getResponseBody().close();
+                return;
+            }
+            String page = getPageFromResource("/src" + requestedDocument);
+            t.sendResponseHeaders(200, page.length());
+            t.getResponseBody().write(page.getBytes(StandardCharsets.UTF_8));
+            t.getResponseBody().close();
         }
     }
 }
