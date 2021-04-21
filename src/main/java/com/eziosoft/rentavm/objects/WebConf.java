@@ -28,6 +28,8 @@ public class WebConf {
         return dbip;
     }
 
+    public String getSalt() { return salt; }
+
     public void createDefaultConfig(){
         this.webport = 6969;
         this.dbport = 28015;

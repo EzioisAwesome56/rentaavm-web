@@ -1,24 +1,33 @@
 package com.eziosoft.rentavm;
 
+import com.eziosoft.rentavm.objects.Session;
+import com.eziosoft.rentavm.objects.User;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.apache.commons.io.IOUtils;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static com.eziosoft.rentavm.Main.getPageFromResource;
 import static com.eziosoft.rentavm.Main.queryToMap;
 
 public class Pages {
 
+    private static Random random = new Random();
+
     // function to send error pages to the client
     private static void sendErrorPage(int errorcode, HttpExchange e) throws IOException {
         String errorPage = getPageFromResource("/src/error/" + Integer.toString(errorcode) + ".html");
-        e.sendResponseHeaders(errorcode, errorPage.length());
+        e.sendResponseHeaders(200, errorPage.length());
         e.getResponseBody().write(errorPage.getBytes(StandardCharsets.UTF_8));
         // close the stream
         e.getResponseBody().close();
@@ -77,6 +86,7 @@ public class Pages {
             // did the user leave any of the fields blank?
             if (data.get("username").isBlank() || data.get("email").isBlank() || data.get("pass1").isBlank() || data.get("pass2").isBlank()){
                 sendErrorPage(580, e);
+                return;
             }
             // check if provided passwords even match
             if (!data.get("pass1").equals(data.get("pass2"))){
@@ -88,7 +98,26 @@ public class Pages {
                 sendErrorPage(579, e);
                 return;
             }
-            // do other stuff here
+            // create new user object
+            User u = new User(data.get("username"), BCrypt.hashpw(data.get("pass1"), Main.conf.getSalt()), data.get("email"));
+            // insert into database
+            Database.insertUser(u);
+            /* while here, lets take a moment to generate a session in the database
+            a session entry has a few different parts
+            - session id, generated from entered username, randomly generated values and system time, Bcrypted and base64'd
+            - when it expires stored as miliseconds
+            - what account it belongs too
+             */
+            String base = data.get("username") + random.nextInt() + System.currentTimeMillis();
+            String token = Base64.getEncoder().encodeToString(BCrypt.hashpw(base, BCrypt.gensalt()).getBytes(StandardCharsets.UTF_8));
+            // make the session itself
+            Session s = new Session(token, System.currentTimeMillis() + TimeUnit.DAYS.toMillis(15), data.get("username"));
+            Database.insertSession(s);
+            // spit cookie onto client
+            e.getResponseHeaders().add("Set-Cookie", "token="+token);
+            e.sendResponseHeaders(200, "Registered? cool gamer moments".length());
+            e.getResponseBody().write("Registered? cool gamer moments".getBytes(StandardCharsets.UTF_8));
+            e.close();
         }
     }
 
