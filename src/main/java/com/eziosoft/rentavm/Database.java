@@ -62,4 +62,8 @@ public class Database {
     public static Session getSession(String token){
         return gson.fromJson(r.table(session).get(token).toJson().run(thonk, String.class).first(), Session.class);
     }
+
+    public static User getUser(String username){
+        return gson.fromJson(r.table(user).get(username).toJson().run(thonk, String.class).first(), User.class);
+    }
 }

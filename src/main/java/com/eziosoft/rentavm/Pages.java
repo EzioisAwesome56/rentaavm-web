@@ -78,9 +78,31 @@ public class Pages {
         public void handle(HttpExchange t) throws IOException{
             // get the post body
             Map<String, String> data = queryToMap(IOUtils.toString(t.getRequestBody(), Charset.defaultCharset()));
-            System.out.println(data.get("username"));
-            t.sendResponseHeaders(200, data.get("username").length());
-            t.getResponseBody().write(data.get("username").getBytes());
+            if (data.size() == 1 || !data.containsKey("username")){
+                sendErrorPage(403, t);
+                return;
+            }
+            if (data.get("username").isBlank() || data.get("password").isBlank()){
+                sendErrorPage(582, t);
+                return;
+            }
+            // check to see if username is valid/exists
+            if (!Database.checkForUser(data.get("username"))){
+                sendErrorPage(584, t);
+                return;
+            }
+            // load user object from database
+            User u = Database.getUser(data.get("username"));
+            // compared password to hashed pass
+            if (!BCrypt.hashpw(data.get("password"), Main.conf.getSalt()).equals(u.getPasshash())){
+                sendErrorPage(583, t);
+                return;
+            }
+            Session s = createSession(u);
+            Database.insertSession(s);
+            t.getResponseHeaders().add("Set-Cookie", "token="+s.getToken()+"; Path=/");
+            sendErrorPage(585, t);
+            return;
         }
     }
 
@@ -111,22 +133,27 @@ public class Pages {
             User u = new User(data.get("username"), BCrypt.hashpw(data.get("pass1"), Main.conf.getSalt()), data.get("email"));
             // insert into database
             Database.insertUser(u);
-            /* while here, lets take a moment to generate a session in the database
+            Session s = createSession(u);
+            Database.insertSession(s);
+            // spit cookie onto client
+            e.getResponseHeaders().add("Set-Cookie", "token="+s.getToken()+"; Path=/");
+            sendErrorPage(581, e);
+            return;
+        }
+    }
+
+    private static Session createSession(User u){
+        /* while here, lets take a moment to generate a session in the database
             a session entry has a few different parts
             - session id, generated from entered username, randomly generated values and system time, Bcrypted and base64'd
             - when it expires stored as miliseconds
             - what account it belongs too
              */
-            String base = data.get("username") + random.nextInt() + System.currentTimeMillis();
-            String token = Base64.getEncoder().encodeToString(BCrypt.hashpw(base, BCrypt.gensalt()).getBytes(StandardCharsets.UTF_8));
-            // make the session itself
-            Session s = new Session(token, System.currentTimeMillis() + TimeUnit.DAYS.toMillis(15), data.get("username"));
-            Database.insertSession(s);
-            // spit cookie onto client
-            e.getResponseHeaders().add("Set-Cookie", "token="+token+"; Path=/");
-            sendErrorPage(581, e);
-            return;
-        }
+        String base = u.getUsername() + random.nextInt() + System.currentTimeMillis();
+        String token = Base64.getEncoder().encodeToString(BCrypt.hashpw(base, BCrypt.gensalt()).getBytes(StandardCharsets.UTF_8));
+        // make the session itself
+        Session s = new Session(token, System.currentTimeMillis() + TimeUnit.DAYS.toMillis(15), u.getUsername());
+        return s;
     }
 
     static class registerFolder implements HttpHandler{
