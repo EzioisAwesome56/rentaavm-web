@@ -27,8 +27,7 @@ public class Pages {
             String filename = t.getRequestURI().getPath();
             System.out.println(filename);
             // check if resource exists
-            URL u = main.class.getResource("/src" + filename);
-            if (u == null){
+            if (main.class.getResource("/src" + filename) == null){
                 String what = getPageFromResource("/404.html");
                 t.sendResponseHeaders(404, what.length());
                 t.getResponseBody().write(what.getBytes());
