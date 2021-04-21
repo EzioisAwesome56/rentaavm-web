@@ -11,17 +11,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class main {
+public class Main {
 
     public static WebConf conf;
     public static boolean dbEnabled;
+    public static boolean debugValue;
 
     public static void main(String[] args) throws IOException{
         dbEnabled = true;
+        debugValue = false;
         // Optional Command Line Parameters parasing
         if (Arrays.stream(args).anyMatch("-nodb"::contains)){
             System.out.println("running web interface without database functionality!");
             dbEnabled = false;
+        }
+        if (Arrays.stream(args).anyMatch("-true"::contains)){
+            System.out.println("Set debug return value to true");
+            debugValue = true;
         }
 
         // quickly check to see if we have a config file present
@@ -60,7 +66,7 @@ public class main {
     }
 
     public static String getPageFromResource(String name){
-        return new Scanner(main.class.getResourceAsStream(name), "UTF-8").useDelimiter("\\A").next();
+        return new Scanner(Main.class.getResourceAsStream(name), "UTF-8").useDelimiter("\\A").next();
     }
 
     // from https://stackoverflow.com/questions/11640025/how-to-obtain-the-query-string-in-a-get-with-java-httpserver-httpexchange

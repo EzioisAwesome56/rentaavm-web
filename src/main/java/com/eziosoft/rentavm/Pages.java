@@ -9,8 +9,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import static com.eziosoft.rentavm.main.getPageFromResource;
-import static com.eziosoft.rentavm.main.queryToMap;
+import static com.eziosoft.rentavm.Main.getPageFromResource;
+import static com.eziosoft.rentavm.Main.queryToMap;
 
 public class Pages {
 
@@ -36,7 +36,7 @@ public class Pages {
             String filename = t.getRequestURI().getPath();
             //debug shit System.out.println(filename);
             // check if resource exists
-            if (main.class.getResource("/src" + filename) == null){
+            if (Main.class.getResource("/src" + filename) == null){
                 sendErrorPage(404, t);
                 return;
             }
@@ -69,6 +69,14 @@ public class Pages {
         public void handle(HttpExchange e) throws IOException {
             // get post data
             Map<String, String> data = queryToMap(IOUtils.toString(e.getRequestBody(), Charset.defaultCharset()));
+            if (data.size() == 1 || !data.containsKey("username")){
+                sendErrorPage(403, e);
+                return;
+            }
+            // did the user leave any of the fields blank?
+            if (data.get("username").isBlank() || data.get("email").isBlank() || data.get("pass1").isBlank() || data.get("pass2").isBlank()){
+                sendErrorPage(580, e);
+            }
             // check if provided passwords even match
             if (!data.get("pass1").equals(data.get("pass2"))){
                 sendErrorPage(578, e);

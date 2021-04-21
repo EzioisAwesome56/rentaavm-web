@@ -13,7 +13,7 @@ public class Database {
     public static void DatabaseInit(){
         System.out.println("Eziosoft Rentavm database driver starting up...");
         // build connection
-        Connection.Builder builder = r.connection().hostname(main.conf.getDbip()).port(main.conf.getDbport());
+        Connection.Builder builder = r.connection().hostname(Main.conf.getDbip()).port(Main.conf.getDbport());
         thonk = builder.connect();
 
         // basically lifted from Dankcord: check to see if our database actually friggin exists
@@ -38,6 +38,9 @@ public class Database {
 
     public static boolean checkForUser(String username){
         // do cool things here
+        if (!Main.dbEnabled){
+            return Main.debugValue;
+        }
         return r.table("users").get("username").count().eq(1).run(thonk, boolean.class).first();
     }
 }
