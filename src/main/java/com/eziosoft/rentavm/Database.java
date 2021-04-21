@@ -31,6 +31,7 @@ public class Database {
             r.db("rentavm").tableCreate("session").optArg("primary_key", "token").run(thonk);
             r.db("rentavm").tableCreate("users").optArg("primary_key", "username").run(thonk);
             r.db("rentavm").tableCreate("vms").optArg("primary_key", "vmid").run(thonk);
+            r.db("rentavm").tableCreate("logs").run(thonk);
             // some other third thing we might store in the database later idk
             //r.db("rentavm").tableCreate("auth").optArg("primary_key", "username").run(thonk);
             System.out.println("Database created!");
