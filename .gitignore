@@ -4,3 +4,6 @@ database/
 src/test/
 rentavmweb.iml
 rentavm-web.iml
+node_modules
+.pnpm-debug.log
+config.json
