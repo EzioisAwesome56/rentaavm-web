@@ -6,13 +6,15 @@ public class user {
     private int vmid;
     private boolean[] hasWindowsVM;
     private int contid;
+    private String email;
 
-    public user(String username, String passhash){
+    public user(String username, String passhash, String email){
         this.username = username;
         this.passhash = passhash;
         this.vmid = 0;
         this.hasWindowsVM = new boolean[]{false, false};
         this.contid = 0;
+        this.email = email;
     }
 
     public boolean[] getHasWindowsVM() {
@@ -33,5 +35,9 @@ public class user {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }
