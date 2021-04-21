@@ -22,6 +22,12 @@ public class Main {
         dbEnabled = true;
         debugValue = false;
         // Optional Command Line Parameters parasing
+        if (Arrays.stream(args).anyMatch("-help"::contains)){
+            System.out.println("Rentavm help");
+            System.out.println("-nodb: disables database initilization and in some cases functions");
+            System.out.println("-true: sets debug return value to true (used in very few commands");
+            System.exit(0);
+        }
         if (Arrays.stream(args).anyMatch("-nodb"::contains)){
             System.out.println("running web interface without database functionality!");
             dbEnabled = false;
