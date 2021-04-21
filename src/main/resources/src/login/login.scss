@@ -1,0 +1,26 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#login-form-box {
+  margin: auto auto;
+  height: 100%;
+  width: 100%;
+  form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 6px;
+    * {
+      margin: 2;
+    }
+    input {
+      padding: 2px
+    }
+  }
+}
