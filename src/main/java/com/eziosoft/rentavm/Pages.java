@@ -52,9 +52,9 @@ public class Pages {
                 sendErrorPage(404, t);
                 return;
             }
-            if (filename.equals("/login/")){
+            if (filename.equals("/login/") || filename.equals("/login")){
                 // return index.html
-                String what = getPageFromResource("/src"+filename+"index.html");
+                String what = getPageFromResource("/src"+filename + "/" +"index.html");
                 t.sendResponseHeaders(200, what.length());
                 t.getResponseBody().write(what.getBytes());
                 t.getResponseBody().close();
@@ -85,9 +85,9 @@ public class Pages {
                 sendErrorPage(404, t);
                 return;
             }
-            if (requestedDocument.equals("/register/")){
+            if (requestedDocument.equals("/register/") || requestedDocument.equals("/register")){
                 // return index.html
-                requestedDocument = getPageFromResource("/src" + requestedDocument + "index.html");
+                requestedDocument = getPageFromResource("/src" + requestedDocument + "/" + "index.html");
                 t.sendResponseHeaders(200, requestedDocument.length());
                 t.getResponseBody().write(requestedDocument.getBytes(StandardCharsets.UTF_8));
                 t.getResponseBody().close();
