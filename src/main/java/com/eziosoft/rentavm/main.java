@@ -39,9 +39,9 @@ public class main {
         }
         // start by making a httpserver instance
         HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 6969), 0);
-        server.createContext("/", new landing());
-        server.createContext("/login", new login());
-        server.createContext("/dologin", new dologin());
+        server.createContext("/", new Pages.landing());
+        server.createContext("/login", new Pages.login());
+        server.createContext("/api/dologin", new Pages.dologin());
         server.setExecutor(null);
         server.start();
         System.out.println("web server started");
@@ -52,7 +52,7 @@ public class main {
     }
 
     // from https://stackoverflow.com/questions/11640025/how-to-obtain-the-query-string-in-a-get-with-java-httpserver-httpexchange
-    private static Map<String, String> queryToMap(String query) {
+    static Map<String, String> queryToMap(String query) {
         Map<String, String> result = new HashMap<>();
         for (String param : query.split("&")) {
             String[] entry = param.split("=");
@@ -63,33 +63,6 @@ public class main {
             }
         }
         return result;
-    }
-
-    static class landing implements HttpHandler{
-        public void handle(HttpExchange t) throws IOException{
-            String what = getPageFromResource("/src/main.html");
-            t.sendResponseHeaders(200, what.length());
-            t.getResponseBody().write(what.getBytes());
-
-        }
-    }
-
-    static class login implements HttpHandler{
-        public void handle(HttpExchange t) throws IOException{
-            String what = getPageFromResource("/src/login.html");
-            t.sendResponseHeaders(200, what.length());
-            t.getResponseBody().write(what.getBytes());
-        }
-    }
-
-    static class dologin implements HttpHandler{
-        public void handle(HttpExchange t) throws IOException{
-            // get the post body
-            Map<String, String> data = queryToMap(IOUtils.toString(t.getRequestBody(), Charset.defaultCharset()));
-            System.out.println(data.get("username"));
-            t.sendResponseHeaders(200, data.get("username").length());
-            t.getResponseBody().write(data.get("username").getBytes());
-        }
     }
 
 
