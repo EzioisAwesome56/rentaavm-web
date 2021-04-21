@@ -3,6 +3,7 @@ package com.eziosoft.rentavm;
 import com.eziosoft.rentavm.objects.WebConf;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.*;
 import java.net.InetSocketAddress;

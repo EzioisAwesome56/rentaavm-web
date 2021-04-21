@@ -3,6 +3,7 @@ package com.eziosoft.rentavm;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.apache.commons.io.IOUtils;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
