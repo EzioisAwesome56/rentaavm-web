@@ -44,7 +44,7 @@ public class main {
         }
         // do we init the db?
         if (dbEnabled){
-            database.DatabaseInit();
+            Database.DatabaseInit();
         }
 
         // start by making a httpserver instance
@@ -53,6 +53,7 @@ public class main {
         server.createContext("/login", new Pages.loginFolder());
         server.createContext("/api/dologin", new Pages.dologin());
         server.createContext("/register", new Pages.registerFolder());
+        server.createContext("/api/doregister", new Pages.doRegister());
         server.setExecutor(null);
         server.start();
         System.out.println("web server started");

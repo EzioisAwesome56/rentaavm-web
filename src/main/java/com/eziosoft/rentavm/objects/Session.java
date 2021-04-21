@@ -1,10 +1,10 @@
 package com.eziosoft.rentavm.objects;
 
-public class session {
+public class Session {
     private String token;
     private boolean isActive;
 
-    public session(String token){
+    public Session(String token){
         this.token = token;
         this.isActive = true;
     }

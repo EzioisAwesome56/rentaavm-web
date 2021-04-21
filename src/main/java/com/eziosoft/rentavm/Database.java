@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.rethinkdb.net.Connection;
 import com.rethinkdb.RethinkDB;
 
-public class database {
+public class Database {
 
     private static Connection thonk;
     private static final RethinkDB r = RethinkDB.r;
@@ -34,5 +34,10 @@ public class database {
         thonk.use("rentavm");
         // init done
         System.out.println("Database driver has finished starting up!");
+    }
+
+    public static boolean checkForUser(String username){
+        // do cool things here
+        return r.table("users").get("username").count().eq(1).run(thonk, boolean.class).first();
     }
 }

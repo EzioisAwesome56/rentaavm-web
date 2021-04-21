@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpHandler;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -17,18 +16,7 @@ public class Pages {
 
     // function to send error pages to the client
     private static void sendErrorPage(int errorcode, HttpExchange e) throws IOException {
-        String errorPage;
-        switch (errorcode){
-            case 404:
-                errorPage = getPageFromResource("/src/error/404.html");
-                break;
-            case 403:
-                errorPage = getPageFromResource("/src/error/403.html");
-                break;
-            default:
-                errorPage = "Error while processing error!";
-                break;
-        }
+        String errorPage = getPageFromResource("/src/error/" + Integer.toString(errorcode) + ".html");
         e.sendResponseHeaders(errorcode, errorPage.length());
         e.getResponseBody().write(errorPage.getBytes(StandardCharsets.UTF_8));
         // close the stream
@@ -74,6 +62,24 @@ public class Pages {
             System.out.println(data.get("username"));
             t.sendResponseHeaders(200, data.get("username").length());
             t.getResponseBody().write(data.get("username").getBytes());
+        }
+    }
+
+    static class doRegister implements HttpHandler{
+        public void handle(HttpExchange e) throws IOException {
+            // get post data
+            Map<String, String> data = queryToMap(IOUtils.toString(e.getRequestBody(), Charset.defaultCharset()));
+            // check if provided passwords even match
+            if (!data.get("pass1").equals(data.get("pass2"))){
+                sendErrorPage(578, e);
+                return;
+            }
+            // look and see if the username is taken
+            if (Database.checkForUser(data.get("username"))){
+                sendErrorPage(579, e);
+                return;
+            }
+            // do other stuff here
         }
     }
 

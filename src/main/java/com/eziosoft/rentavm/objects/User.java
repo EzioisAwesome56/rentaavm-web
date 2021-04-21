@@ -1,6 +1,6 @@
 package com.eziosoft.rentavm.objects;
 
-public class user {
+public class User {
     private String username;
     private String passhash;
     private int vmid;
@@ -8,7 +8,7 @@ public class user {
     private int contid;
     private String email;
 
-    public user(String username, String passhash, String email){
+    public User(String username, String passhash, String email){
         this.username = username;
         this.passhash = passhash;
         this.vmid = 0;
