@@ -9,10 +9,12 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.net.HttpCookie;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +37,14 @@ public class Pages {
 
     static class landing implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
+            String username = "guest";
+            List<String> h = t.getRequestHeaders().get("Cookie");
+            if (!h.isEmpty()){
+                String token = h.get(0).split("=")[1];
+                username = Database.getSession(token).getOwner();
+            }
             String what = getPageFromResource("/src/main.html");
+            what = what.replace("{{$USER$}}", username);
             t.sendResponseHeaders(200, what.length());
             t.getResponseBody().write(what.getBytes());
         }
@@ -114,7 +123,7 @@ public class Pages {
             Session s = new Session(token, System.currentTimeMillis() + TimeUnit.DAYS.toMillis(15), data.get("username"));
             Database.insertSession(s);
             // spit cookie onto client
-            e.getResponseHeaders().add("Set-Cookie", "token="+token);
+            e.getResponseHeaders().add("Set-Cookie", "token="+token+"; Path=/");
             e.sendResponseHeaders(200, "Registered? cool gamer moments".length());
             e.getResponseBody().write("Registered? cool gamer moments".getBytes(StandardCharsets.UTF_8));
             e.close();

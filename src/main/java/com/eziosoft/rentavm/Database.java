@@ -58,4 +58,8 @@ public class Database {
     public static void insertSession(Session s){
         r.table(session).insert(s).run(thonk);
     }
+
+    public static Session getSession(String token){
+        return gson.fromJson(r.table(session).get(token).toJson().run(thonk, String.class).first(), Session.class);
+    }
 }
