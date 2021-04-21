@@ -39,7 +39,7 @@ public class Pages {
         public void handle(HttpExchange t) throws IOException {
             String username = "guest";
             List<String> h = t.getRequestHeaders().get("Cookie");
-            if (!h.isEmpty()){
+            if (h != null){
                 String token = h.get(0).split("=")[1];
                 username = Database.getSession(token).getOwner();
             }
@@ -124,9 +124,8 @@ public class Pages {
             Database.insertSession(s);
             // spit cookie onto client
             e.getResponseHeaders().add("Set-Cookie", "token="+token+"; Path=/");
-            e.sendResponseHeaders(200, "Registered? cool gamer moments".length());
-            e.getResponseBody().write("Registered? cool gamer moments".getBytes(StandardCharsets.UTF_8));
-            e.close();
+            sendErrorPage(581, e);
+            return;
         }
     }
 
