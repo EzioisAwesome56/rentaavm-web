@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -17,8 +18,16 @@ import java.util.Scanner;
 public class main {
 
     public static WebConf conf;
+    public static boolean dbEnabled;
 
     public static void main(String[] args) throws IOException{
+        dbEnabled = true;
+        // Optional Command Line Parameters parasing
+        if (Arrays.stream(args).anyMatch("-nodb"::contains)){
+            System.out.println("running web interface without database functionality!");
+            dbEnabled = false;
+        }
+
         // quickly check to see if we have a config file present
         File fileconf = new File("config.json");
         if (!fileconf.exists()){
