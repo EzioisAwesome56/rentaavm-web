@@ -32,6 +32,7 @@ public class Pages {
                 String what = getPageFromResource("/404.html");
                 t.sendResponseHeaders(404, what.length());
                 t.getResponseBody().write(what.getBytes());
+                t.getResponseBody().close();
                 return;
             }
             if (filename.equals("/login/")){
@@ -39,11 +40,13 @@ public class Pages {
                 String what = getPageFromResource("/src"+filename+"index.html");
                 t.sendResponseHeaders(200, what.length());
                 t.getResponseBody().write(what.getBytes());
+                t.getResponseBody().close();
                 return;
             }
             String what = getPageFromResource("/src"+filename);
             t.sendResponseHeaders(200, what.length());
             t.getResponseBody().write(what.getBytes());
+            t.getResponseBody().close();
         }
     }
 
