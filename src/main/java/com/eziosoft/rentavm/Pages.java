@@ -99,6 +99,8 @@ public class Pages {
                 return;
             }
             Session s = createSession(u);
+            // delete any old sessions rotting away first
+            Database.deleteAllSessionsFromUser(s.getOwner());
             Database.insertSession(s);
             t.getResponseHeaders().add("Set-Cookie", "token="+s.getToken()+"; Path=/");
             sendErrorPage(585, t);

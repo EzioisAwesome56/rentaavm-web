@@ -70,4 +70,8 @@ public class Database {
     public static void deleteSession(String token){
         r.table(session).get(token).delete().run(thonk);
     }
+
+    public static void deleteAllSessionsFromUser(String username){
+        r.table(session).filter(r.row("owner").eq(username)).delete().run(thonk);
+    }
 }
