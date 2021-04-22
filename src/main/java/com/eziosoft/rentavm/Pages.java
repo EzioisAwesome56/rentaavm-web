@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.apache.commons.io.IOUtils;
 import org.mindrot.jbcrypt.BCrypt;
+import org.slf4j.helpers.Util;
 
 import javax.xml.crypto.Data;
 import java.io.IOException;
@@ -95,6 +96,7 @@ public class Pages {
             User u = Database.getUser(data.get("username"));
             // compared password to hashed pass
             if (!BCrypt.hashpw(data.get("password"), Main.conf.getSalt()).equals(u.getPasshash())){
+                Utilities.doLog("Failed login attempt for this user account", u.getUsername());
                 sendErrorPage(583, t);
                 return;
             }
@@ -104,6 +106,7 @@ public class Pages {
             Database.insertSession(s);
             t.getResponseHeaders().add("Set-Cookie", "token="+s.getToken()+"; Path=/");
             sendErrorPage(585, t);
+            Utilities.doLog("user logged in", s.getOwner());
             return;
         }
     }
@@ -153,6 +156,7 @@ public class Pages {
             // spit cookie onto client
             e.getResponseHeaders().add("Set-Cookie", "token="+s.getToken()+"; Path=/");
             sendErrorPage(581, e);
+            Utilities.doLog("user account created", u.getUsername());
             return;
         }
     }

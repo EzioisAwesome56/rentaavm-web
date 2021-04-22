@@ -1,5 +1,6 @@
 package com.eziosoft.rentavm;
 
+import com.eziosoft.rentavm.objects.LogEntry;
 import com.eziosoft.rentavm.objects.Session;
 import com.eziosoft.rentavm.objects.User;
 import com.google.gson.Gson;
@@ -74,5 +75,9 @@ public class Database {
 
     public static void deleteAllSessionsFromUser(String username){
         r.table(session).filter(r.row("owner").eq(username)).delete().run(thonk);
+    }
+
+    public static void writeLogEntry(LogEntry e){
+        r.table("logs").insert(e).run(thonk);
     }
 }
