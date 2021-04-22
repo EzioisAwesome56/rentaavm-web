@@ -155,18 +155,19 @@ public class Pages {
             } else {
                 page = getPageFromResource("/src" + requestedDocument);
             }
+            String user = getLoggedInUserName(e);
             // check what, if any, special processing is required for the page
             if (page.contains("{{$USER$}}")){
-                page = page.replace("{{$USER$}}", getLoggedInUserName(e));
+                page = page.replace("{{$USER$}}", user);
             }
             if (page.contains("{{$FREESTAT$}}")){
-                page = page.replace("{{$FREESTAT$}}", Utilities.generateVMStats(getLoggedInUserName(e)));
+                page = page.replace("{{$FREESTAT$}}", Utilities.generateVMStats(user));
             }
             if (page.contains("{{$CONTSTAT$}}")){
-                page = page.replace("{{$CONTSTAT$}}", "Unimplimented!");
+                page = page.replace("{{$CONTSTAT$}}", Utilities.generateContainerStats(user));
             }
             if (page.contains("{{$WINSTAT$}}")){
-                page = page.replace("{{$WINSTAT$}}", "Unimplimented!");
+                page = page.replace("{{$WINSTAT$}}", Utilities.generateWindowsStats(user));
             }
             // send the page that has finished processing
             e.sendResponseHeaders(200, page.length());
