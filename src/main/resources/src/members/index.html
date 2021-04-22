@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <title>Member area for {{$USER$}}</title>
+        <style>body { text-align: center; }
+        #box { border: 2px solid black; width: 50%; margin: auto;}</style>
+    </head>
+    <body>
+        <h1>Welcome, {{$USER$}}</h1><hr>
+        <h2>VM Subscription and Management Panel</h2><br>
+        <div id="box">
+            <h3>Free tier linux vm</h3><br>
+            {{$FREESTAT$}}<hr>
+            <h3>Free tier Container</h3><br>
+            {{$CONTSTAT$}}<hr>
+            <h3>Windows VM Access</h3><br>
+            {{$WINSTAT$}}
+        </div>
+    </body>
+</html>

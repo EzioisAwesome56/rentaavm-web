@@ -68,6 +68,7 @@ public class Main {
         server.createContext("/register", new Pages.registerFolder());
         server.createContext("/api/doregister", new Pages.doRegister());
         server.createContext("/api/dologout", new Pages.doLogout());
+        server.createContext("/members", new Pages.membersFolder());
         server.setExecutor(null);
         server.start();
         System.out.println("web server started");

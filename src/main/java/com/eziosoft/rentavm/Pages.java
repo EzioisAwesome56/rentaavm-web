@@ -2,6 +2,7 @@ package com.eziosoft.rentavm;
 
 import com.eziosoft.rentavm.objects.Session;
 import com.eziosoft.rentavm.objects.User;
+import com.rethinkdb.gen.ast.Http;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.apache.commons.io.IOUtils;
@@ -36,7 +37,7 @@ public class Pages {
         e.getResponseBody().close();
     }
 
-    public static String getLoggedInUserName(HttpExchange e){
+    private static String getLoggedInUserName(HttpExchange e){
         String username = "guest";
         List<String> h = e.getRequestHeaders().get("Cookie");
         if (h != null){
@@ -46,6 +47,10 @@ public class Pages {
             }
         }
         return username;
+    }
+
+    private static String getSessionToken(HttpExchange e){
+        return e.getRequestHeaders().get("Cookie").get(0).split("=")[1];
     }
 
     static class landing implements HttpHandler {
@@ -128,6 +133,45 @@ public class Pages {
             Database.deleteSession(token);
             sendErrorPage(586, e);
             return;
+        }
+    }
+
+    static class membersFolder implements HttpHandler{
+        public void handle(HttpExchange e) throws IOException {
+            // check to make sure the user is logged in (or atleast has a valid cookie)
+            if (e.getRequestHeaders().get("Cookie") == null || !Database.checkSessionValid(getSessionToken(e))){
+                sendErrorPage(401, e);
+                return;
+            }
+            String requestedDocument = e.getRequestURI().getPath();
+            if (Pages.class.getResource("/src" + requestedDocument) == null){
+                sendErrorPage(404, e);
+                return;
+            }
+            String page;
+            if (requestedDocument.equals("/members/") || requestedDocument.equals("/members")){
+                // return index.html
+                page = getPageFromResource("/src" + requestedDocument + "/" + "index.html");
+            } else {
+                page = getPageFromResource("/src" + requestedDocument);
+            }
+            // check what, if any, special processing is required for the page
+            if (page.contains("{{$USER$}}")){
+                page = page.replace("{{$USER$}}", getLoggedInUserName(e));
+            }
+            if (page.contains("{{$FREESTAT$}}")){
+                page = page.replace("{{$FREESTAT$}}", Utilities.generateVMStats(getLoggedInUserName(e)));
+            }
+            if (page.contains("{{$CONTSTAT$}}")){
+                page = page.replace("{{$CONTSTAT$}}", "Unimplimented!");
+            }
+            if (page.contains("{{$WINSTAT$}}")){
+                page = page.replace("{{$WINSTAT$}}", "Unimplimented!");
+            }
+            // send the page that has finished processing
+            e.sendResponseHeaders(200, page.length());
+            e.getResponseBody().write(page.getBytes(StandardCharsets.UTF_8));
+            e.getResponseBody().close();
         }
     }
 
