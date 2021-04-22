@@ -36,16 +36,21 @@ public class Pages {
         e.getResponseBody().close();
     }
 
+    public static String getLoggedInUserName(HttpExchange e){
+        String username = "guest";
+        List<String> h = e.getRequestHeaders().get("Cookie");
+        if (h != null){
+            String token = h.get(0).split("=")[1];
+            if (Database.checkSessionValid(token)){
+                username = Database.getSession(token).getOwner();
+            }
+        }
+        return username;
+    }
+
     static class landing implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            String username = "guest";
-            List<String> h = t.getRequestHeaders().get("Cookie");
-            if (h != null){
-                String token = h.get(0).split("=")[1];
-                if (Database.checkSessionValid(token)){
-                    username = Database.getSession(token).getOwner();
-                }
-            }
+            String username = getLoggedInUserName(t);
             String what = getPageFromResource("/src/main.html");
             what = what.replace("{{$USER$}}", username);
             t.sendResponseHeaders(200, what.length());

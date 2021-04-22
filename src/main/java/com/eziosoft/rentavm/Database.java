@@ -95,7 +95,7 @@ public class Database {
         // if we have something, load it
         Session s = getSession(token);
         // is it expired?
-        if (s.getExpire() < System.currentTimeMillis() + TimeUnit.DAYS.toMillis(15)){
+        if (s.getExpire() < System.currentTimeMillis()){
             return false;
         }
         // is it set to inactive for some reason
