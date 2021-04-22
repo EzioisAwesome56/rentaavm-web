@@ -8,6 +8,7 @@ import com.rethinkdb.net.Connection;
 import com.rethinkdb.RethinkDB;
 
 import java.rmi.server.ExportException;
+import java.util.concurrent.TimeUnit;
 
 public class Database {
 
@@ -74,10 +75,30 @@ public class Database {
     }
 
     public static void deleteAllSessionsFromUser(String username){
-        r.table(session).filter(r.row("owner").eq(username)).delete().run(thonk);
+        try {
+            r.table(session).filter(r.hashMap("owner", username)).delete().run(thonk);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void writeLogEntry(LogEntry e){
         r.table("logs").insert(e).run(thonk);
+    }
+
+    public static boolean checkSessionValid(String token){
+        // first we check to see if the session token returns any hits
+        boolean exists = r.table(session).getAll(token).count().eq(1).run(thonk, boolean.class).first();
+        if (!exists){
+            return exists;
+        }
+        // if we have something, load it
+        Session s = getSession(token);
+        // is it expired?
+        if (s.getExpire() < System.currentTimeMillis() + TimeUnit.DAYS.toMillis(15)){
+            return false;
+        }
+        // is it set to inactive for some reason
+        return s.isActive();
     }
 }

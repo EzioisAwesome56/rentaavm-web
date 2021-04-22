@@ -42,7 +42,9 @@ public class Pages {
             List<String> h = t.getRequestHeaders().get("Cookie");
             if (h != null){
                 String token = h.get(0).split("=")[1];
-                username = Database.getSession(token).getOwner();
+                if (Database.checkSessionValid(token)){
+                    username = Database.getSession(token).getOwner();
+                }
             }
             String what = getPageFromResource("/src/main.html");
             what = what.replace("{{$USER$}}", username);
