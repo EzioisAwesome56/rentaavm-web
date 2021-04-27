@@ -61,7 +61,7 @@ public class Main {
         }
 
         // start by making a httpserver instance
-        HttpServer server = HttpServer.create(new InetSocketAddress("localhost", conf.getWebport()), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(conf.getWebip(), conf.getWebport()), 0);
         server.createContext("/", new Pages.landing());
         server.createContext("/login", new Pages.loginFolder());
         server.createContext("/api/dologin", new Pages.dologin());

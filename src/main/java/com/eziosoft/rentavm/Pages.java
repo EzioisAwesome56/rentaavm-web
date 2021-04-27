@@ -10,7 +10,10 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.helpers.Util;
 
 import javax.xml.crypto.Data;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpCookie;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -247,6 +250,43 @@ public class Pages {
             t.sendResponseHeaders(200, page.length());
             t.getResponseBody().write(page.getBytes(StandardCharsets.UTF_8));
             t.getResponseBody().close();
+        }
+    }
+
+    static class doVMCreate implements HttpHandler{
+        @Override
+        public void handle(HttpExchange e) throws IOException {
+            // check if they have a valid session
+            if (e.getRequestHeaders().get("Cookie") == null || !Database.checkSessionValid(getSessionToken(e))){
+                sendErrorPage(401, e);
+                return;
+            }
+            // first we should probably get the username of the person whos making the vm
+            String user = getLoggedInUserName(e);
+            // also we need post data
+            Map<String, String> data = queryToMap(IOUtils.toString(e.getRequestBody(), Charset.defaultCharset()));
+            // check to see if entered passwords work or not
+            if (!data.get("pass1").equals(data.get("pass2"))){
+                sendErrorPage(587, e);
+                return;
+            }
+            File configfolder = new File("/etc/pve/qemu-server");
+            // count total number of vms in folder + subtract preset value of unrelated vms
+            int filecount = configfolder.list().length - Main.conf.getSubtract();
+            // add to base id + 1 to get new vm id
+            int vmid = filecount + Main.conf.getStartId() + 1;
+            /* VERY IMPORTANT NOTE:
+            this programs requires either
+            - running on root (please dont do this)
+            or
+            - password-less sudo access to the following commands on proxmox: qm, echo
+            this is required for the proper cloning and shuffling around of cloudinit config files and whatever else so uh
+            you can do this by using visudo and adding these lines to your file
+            user host = (root) NOPASSWD: /usr/sbin/qm
+            user host = (root) NOPASSWD: /usr/bin/echo
+             */
+            Process qm = new ProcessBuilder("sudo qm clone "+ Main.conf.getTemplate() + " " + vmid + " | echo debug.txt").start();
+            sendErrorPage(404, e);
         }
     }
 }
