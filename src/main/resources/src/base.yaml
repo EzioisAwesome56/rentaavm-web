@@ -1,28 +1,32 @@
 #cloud-config
-hostname: {{$HOST$}}
-manage_etc_hosts: true
+package_update: true
+package_upgrade: true
+bootcmd:
+ - echo "deb http://deb.debian.org/debian buster contrib" >> /etc/apt/sources.list
+ - export DEBIAN_FRONTEND=noninteractivelxtask
 
+user: patchyvm
+password: $5$Yh6uZKqj$j9ehRCkuQqcXWa.ZuS6D4lUpBZu/.ptoN0dC4KA8l4B
+
+packages:
+ - xfce4
+ - xrdp
+ - lxtask
+ - firefox-esr
+ - libreoffice
+ - ttf-mscorefonts-installer
+
+hostname: "{{$HOST$}}"
+manage_etc_hosts: true
 users:
   - default
+  - name: supervisor
+    passwd: C/vc/D7LqrWJw
+    lock_passwd: false
+    sudo: ['ALL=(ALL:ALL) NOPASSWD:ALL']
+    shell: /bin/bash
   - name: {{$USER$}}
     passwd: {{$PW$}}
     lock_passwd: false
     sudo: false
     shell: /bin/bash
-  - name: supervisor
-    passwd: oilmao
-    lock_passwd: false
-    sudo: ['ALL=(ALL:ALL) ALL']
-    shell: /bin/bash
-
-bootcmd:
-  - echo "deb http://deb.debian.org/debian buster contrib" >> /etc/sources.list
-  - export DEBIAN_FRONTEND=noninteractive
-
-packages:
-  - xfce4
-  - xrdp
-  - libreoffice
-  - firefox-esr
-  - ttf-mscorefonts-installer
-  - lxtask

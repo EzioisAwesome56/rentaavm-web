@@ -8,12 +8,10 @@ import com.sun.net.httpserver.HttpHandler;
 import org.apache.commons.io.IOUtils;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.helpers.Util;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.xml.crypto.Data;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpCookie;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -285,21 +283,22 @@ public class Pages {
             this programs requires either
             - running on root (please dont do this)
             or
-            - password-less sudo access to the following commands on proxmox: qm, echo
+            - password-less sudo access to the following commands on proxmox: qm, cp
             this is required for the proper cloning and shuffling around of cloudinit config files and whatever else so uh
             you can do this by using visudo and adding these lines to your file
             user host = (root) NOPASSWD: /usr/sbin/qm
-            user host = (root) NOPASSWD: /usr/bin/echo
+            user host = (root) NOPASSWD: /usr/bin/cp
              */
             String[] cmd = {"/bin/bash", "-c", "sudo qm clone " + Main.conf.getTemplate() + " " + vmid};
+            Process qm;
+            Runtime run = Runtime.getRuntime();
             if (Main.debug){
                 System.err.println("DEBUG: Now calling sub process...");
                 System.err.println(cmd);
             }
 
             try {
-                Runtime run = Runtime.getRuntime();
-                Process qm = run.exec(cmd);
+                qm = run.exec(cmd);
                 qm.waitFor();
                 if (Main.debug) {
                     BufferedReader buf = new BufferedReader(new InputStreamReader(qm.getInputStream()));
@@ -311,6 +310,89 @@ public class Pages {
             } catch (Exception h){
                 h.printStackTrace();
             }
+            // we need to generate the original cloudinit file now
+            if (Main.debug){
+                System.err.println("DEBUG: Setting initial cloudinit options");
+            }
+            try {
+                cmd = new String[]{"/bin/bash", "-c", "sudo qm set " + vmid + " --ciuser \"" + data.get("user") + "\" --cipassword  \"" + data.get("pass1") + "\" --name \"" + vmid + "\""};
+                qm = run.exec(cmd);
+                qm.waitFor();
+                if (Main.debug) {
+                    BufferedReader buf = new BufferedReader(new InputStreamReader(qm.getInputStream()));
+                    String line = "";
+                    while ((line = buf.readLine()) != null) {
+                        System.err.println(line);
+                    }
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+            // commit dump truck moment
+            if (Main.debug){
+                System.err.println("DEBUG: dumping cloud init file to string");
+            }
+            StringBuilder buiild = new StringBuilder();
+            try {
+                cmd = new String[]{"/bin/bash", "-c", "sudo qm cloudinit dump " + vmid + " user"};
+                qm = run.exec(cmd);
+                qm.waitFor();
+                BufferedReader buf = new BufferedReader(new InputStreamReader(qm.getInputStream()));
+                String line = "";
+                while ((line = buf.readLine()) != null){
+                    buiild.append(line + "\n");
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+            // now we need to parse this yaml(ew)
+            Yaml yaml = new Yaml();
+            Map<String, Object> shit = yaml.load(buiild.toString());
+            // get all the data we need out of this shitass YAML
+            String username = shit.get("user").toString();
+            String passhash = shit.get("password").toString();
+            String host = shit.get("hostname").toString();
+            if (Main.debug){
+                System.err.println("Values obtained from YAML");
+                System.err.println(username);
+                System.err.println(passhash);
+                System.err.println(host);
+            }
+            // next we need to load our "magic" presetup yaml file, and also inject what we need
+            String finalconf = getPageFromResource("/src/base.yaml").replace("{{$HOST$}}", host).replace("{{$USER$}}", username).replace("{{$PW$}}", passhash);
+            if (Main.debug){
+                System.err.println("Final cloudinit YAML:");
+                System.err.println(finalconf);
+            }
+            // next we need to write this file to a temp file
+            File trash = File.createTempFile("patchyvm_temp", null);
+            // write string to temp file
+            BufferedWriter bufh = new BufferedWriter(new FileWriter(trash));
+            bufh.write(finalconf);
+            bufh.close();
+            // ok now we have to cp the file somewhere
+            if (Main.debug){
+                System.err.println("PATH for temp file");
+                System.err.println(trash.getAbsolutePath());
+            }
+            cmd = new String[]{"/bin/bash", "-c", "sudo cp " + trash.getAbsolutePath() + " /var/lib/vz/snippets/"+vmid};
+            try {
+                qm = run.exec(cmd);
+                qm.waitFor();
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+            // im pretty sure at this point we can delete the temp file
+            trash.delete();
+            // set cicustom file
+            cmd = new String[]{"/bin/bash", "-c", "sudo qm set " + vmid + " --cicustom \"user=local:snippets/"+vmid+"\""};
+            try {
+                qm = run.exec(cmd);
+                qm.waitFor();
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+            // hopefully now we should be able to just start the virtual machine
             sendErrorPage(404, e);
         }
     }
