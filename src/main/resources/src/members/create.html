@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <title>Free VM Creation page</title>
+    </head>
+    <body>
+        Welcome, {{$USER$}}<br>
+        Please enter your information here to create the vm
+        <form action="/api/docreate" method="POST">
+            <label>Username for VM</label><br>
+            <input type="text" name="user"><br>
+            <label>Password for vm</label><br>
+            <input type="password" name="pass1"><br>
+            <label>Confirm password</label><br>
+            <input type="password" name="pass2"><br>
+            <label>Hostname</label><br>
+            <input type="text" name="host"><br>
+            <input type="submit" value="Create VM">
+        </form>
+    </body>
+</html>

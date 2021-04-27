@@ -270,11 +270,17 @@ public class Pages {
                 sendErrorPage(587, e);
                 return;
             }
+            if (Main.debug) {
+                System.err.println("DEBUG: Now counting files...");
+            }
             File configfolder = new File("/etc/pve/qemu-server");
             // count total number of vms in folder + subtract preset value of unrelated vms
             int filecount = configfolder.list().length - Main.conf.getSubtract();
             // add to base id + 1 to get new vm id
             int vmid = filecount + Main.conf.getStartId() + 1;
+            if (Main.debug) {
+                System.err.println("done counting files!");
+            }
             /* VERY IMPORTANT NOTE:
             this programs requires either
             - running on root (please dont do this)
@@ -285,7 +291,26 @@ public class Pages {
             user host = (root) NOPASSWD: /usr/sbin/qm
             user host = (root) NOPASSWD: /usr/bin/echo
              */
-            Process qm = new ProcessBuilder("sudo qm clone "+ Main.conf.getTemplate() + " " + vmid + " | echo debug.txt").start();
+            String[] cmd = {"/bin/bash", "-c", "sudo qm clone " + Main.conf.getTemplate() + " " + vmid};
+            if (Main.debug){
+                System.err.println("DEBUG: Now calling sub process...");
+                System.err.println(cmd);
+            }
+
+            try {
+                Runtime run = Runtime.getRuntime();
+                Process qm = run.exec(cmd);
+                qm.waitFor();
+                if (Main.debug) {
+                    BufferedReader buf = new BufferedReader(new InputStreamReader(qm.getInputStream()));
+                    String line = "";
+                    while ((line = buf.readLine()) != null) {
+                        System.err.println(line);
+                    }
+                }
+            } catch (Exception h){
+                h.printStackTrace();
+            }
             sendErrorPage(404, e);
         }
     }

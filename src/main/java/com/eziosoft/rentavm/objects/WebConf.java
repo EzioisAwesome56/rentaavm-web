@@ -58,5 +58,6 @@ public class WebConf {
         this.startId = 200;
         this.subtract = 0;
         this.webip = "localhost";
+        this.template = "103";
     }
 }

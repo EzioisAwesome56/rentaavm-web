@@ -17,8 +17,10 @@ public class Main {
     public static WebConf conf;
     public static boolean dbEnabled;
     public static boolean debugValue;
+    public static boolean debug;
 
     public static void main(String[] args) throws IOException{
+        debug = false;
         dbEnabled = true;
         debugValue = false;
         // Optional Command Line Parameters parasing
@@ -26,6 +28,7 @@ public class Main {
             System.out.println("Rentavm help");
             System.out.println("-nodb: disables database initilization and in some cases functions");
             System.out.println("-true: sets debug return value to true (used in very few commands");
+            System.out.println("-debug: enables debug mode");
             System.exit(0);
         }
         if (Arrays.stream(args).anyMatch("-nodb"::contains)){
@@ -35,6 +38,10 @@ public class Main {
         if (Arrays.stream(args).anyMatch("-true"::contains)){
             System.out.println("Set debug return value to true");
             debugValue = true;
+        }
+        if (Arrays.stream(args).anyMatch("-debug"::contains)){
+            System.out.println("debugging mode on");
+            debug = true;
         }
 
         // quickly check to see if we have a config file present
@@ -68,6 +75,7 @@ public class Main {
         server.createContext("/register", new Pages.registerFolder());
         server.createContext("/api/doregister", new Pages.doRegister());
         server.createContext("/api/dologout", new Pages.doLogout());
+        server.createContext("/api/docreate", new Pages.doVMCreate());
         server.createContext("/members", new Pages.membersFolder());
         server.setExecutor(null);
         server.start();
