@@ -251,6 +251,33 @@ public class Pages {
         }
     }
 
+    static class resetVM implements HttpHandler{
+        @Override
+        public void handle(HttpExchange e) throws IOException {
+            // check if they have a valid session
+            if (e.getRequestHeaders().get("Cookie") == null || !Database.checkSessionValid(getSessionToken(e))){
+                sendErrorPage(401, e);
+                return;
+            }
+            // get user name
+            String user = getLoggedInUserName(e);
+            // get user object
+            User u = Database.getUser(user);
+            // now we need to prepare the call to qm to reset the vm
+            Runtime run = Runtime.getRuntime();
+            try {
+                String[] cmd = {"/bin/bash", "-c", "sudo qm reset "+u.getVmid()};
+                Process qm = run.exec(cmd);
+                qm.waitFor();
+            } catch (Exception ex){
+                ex.printStackTrace();
+                sendErrorPage(500, e);
+                return;
+            }
+            sendErrorPage(589, e);
+        }
+    }
+
     static class doVMCreate implements HttpHandler{
         @Override
         public void handle(HttpExchange e) throws IOException {
