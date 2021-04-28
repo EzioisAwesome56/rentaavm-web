@@ -40,6 +40,9 @@ public class Utilities {
             }
             status = build.toString();
             content += "Your vm id is " + u.getVmid() + "<br>"+ status;
+            // generate some helpful links too
+            content += "<a href=\"/api/doreset\">Reset</a><br>";
+            // TODO: Write Server ip obtainer thing
         }
         content += "</div>";
         return content;

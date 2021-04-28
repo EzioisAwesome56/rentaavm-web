@@ -76,6 +76,7 @@ public class Main {
         server.createContext("/api/doregister", new Pages.doRegister());
         server.createContext("/api/dologout", new Pages.doLogout());
         server.createContext("/api/docreate", new Pages.doVMCreate());
+        server.createContext("/api/doreset", new Pages.resetVM());
         server.createContext("/members", new Pages.membersFolder());
         server.setExecutor(null);
         server.start();
