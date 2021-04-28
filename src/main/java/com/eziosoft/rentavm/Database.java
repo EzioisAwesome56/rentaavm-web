@@ -3,6 +3,7 @@ package com.eziosoft.rentavm;
 import com.eziosoft.rentavm.objects.LogEntry;
 import com.eziosoft.rentavm.objects.Session;
 import com.eziosoft.rentavm.objects.User;
+import com.eziosoft.rentavm.objects.VirtualMachine;
 import com.google.gson.Gson;
 import com.rethinkdb.net.Connection;
 import com.rethinkdb.RethinkDB;
@@ -18,6 +19,7 @@ public class Database {
 
     private static String user = "users";
     private static String session = "session";
+    private static String vms = "vms";
 
     public static void DatabaseInit(){
         System.out.println("Eziosoft Rentavm database driver starting up...");
@@ -105,5 +107,9 @@ public class Database {
     public static void updateUser(User u){
         // update the current user entry in the db
         r.table(user).get(u.getUsername()).update(u).run(thonk);
+    }
+
+    public static void insertVm(VirtualMachine vm){
+        r.table(vms).insert(vm).run(thonk);
     }
 }

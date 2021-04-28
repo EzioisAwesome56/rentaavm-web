@@ -7,11 +7,11 @@ public class VirtualMachine {
     private String ipaddr;
     private int port;
 
-    public VirtualMachine(int a, String b, String c, int d){
-        this.vmid = Integer.toString(a);
-        this.owner = b;
-        this.ipaddr = c;
-        this.port = d;
+    public VirtualMachine(int id, String owner, String ip, int port){
+        this.vmid = Integer.toString(id);
+        this.owner = owner;
+        this.ipaddr = ip;
+        this.port = port;
     }
 
     public int getVmid() {
@@ -28,5 +28,9 @@ public class VirtualMachine {
 
     public String getOwner() {
         return owner;
+    }
+
+    public void setIpaddr(String ipaddr) {
+        this.ipaddr = ipaddr;
     }
 }
