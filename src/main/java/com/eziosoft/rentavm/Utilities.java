@@ -4,6 +4,8 @@ import com.eziosoft.rentavm.objects.LogEntry;
 import com.eziosoft.rentavm.objects.User;
 
 import javax.xml.crypto.Data;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 public class Utilities {
 
@@ -20,7 +22,24 @@ public class Utilities {
         if (u.getVmid() == 0){
             content = content + "you currently do not own a vm<br>click <a href=\"/members/buy.html\">here</a> to obtain one";
         } else {
-            // TODO: handle logic for checking the actual vm status or something like that idk
+            // get the status of the vm
+            Runtime run = Runtime.getRuntime();
+            String[] cmd = new String[]{"/bin/bash", "-c", "sudo qm status " + u.getVmid()};
+            String status;
+            StringBuilder build = new StringBuilder();
+            try{
+                Process qm = run.exec(cmd);
+                qm.waitFor();
+                String line = "";
+                BufferedReader buf = new BufferedReader(new InputStreamReader(qm.getInputStream()));
+                while ((line = buf.readLine()) != null){
+                    build.append(line + "\n");
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            status = build.toString();
+            content += "Your vm id is " + u.getVmid() + "<br>"+ status;
         }
         content += "</div>";
         return content;

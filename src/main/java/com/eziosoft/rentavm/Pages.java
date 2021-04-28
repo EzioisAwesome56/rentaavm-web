@@ -392,8 +392,26 @@ public class Pages {
             } catch (Exception ex){
                 ex.printStackTrace();
             }
-            // hopefully now we should be able to just start the virtual machine
-            sendErrorPage(404, e);
+            // store the vm id of the vm in the user's oobject or something idk lol
+            User u = Database.getUser(getLoggedInUserName(e));
+            u.setVmid(vmid);
+            Database.updateUser(u);
+            // start the vm for the very, very first time
+            cmd = new String[]{"/bin/bash", "-c", "sudo qm start "+vmid};
+            try {
+                qm = run.exec(cmd);
+                qm.waitFor();
+                // sleep for a few seconds
+                TimeUnit.SECONDS.sleep(5);
+                // restart the vm (TODO: Figure out why the vm keeps kernel panicing on system boot)
+                cmd = new String[]{"/bin/bash", "-c", "sudo qm reset "+vmid};
+                qm = run.exec(cmd);
+                qm.waitFor();
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+            // in theory that should be all we need!
+            sendErrorPage(588, e);
         }
     }
 }

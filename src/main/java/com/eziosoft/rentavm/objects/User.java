@@ -37,6 +37,10 @@ public class User {
         return username;
     }
 
+    public void setVmid(int id){
+        this.vmid = id;
+    }
+
     public String getEmail() {
         return email;
     }

@@ -101,4 +101,9 @@ public class Database {
         // is it set to inactive for some reason
         return s.isActive();
     }
+
+    public static void updateUser(User u){
+        // update the current user entry in the db
+        r.table(user).get(u.getUsername()).update(u).run(thonk);
+    }
 }
