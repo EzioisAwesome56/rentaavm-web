@@ -336,6 +336,8 @@ public class Pages {
                 }
             } catch (Exception h){
                 h.printStackTrace();
+                sendErrorPage(500, e);
+                return;
             }
             // we need to generate the original cloudinit file now
             if (Main.debug){
@@ -354,6 +356,8 @@ public class Pages {
                 }
             } catch (Exception ex){
                 ex.printStackTrace();
+                sendErrorPage(500, e);
+                return;
             }
             // commit dump truck moment
             if (Main.debug){
@@ -371,6 +375,8 @@ public class Pages {
                 }
             } catch (Exception ex){
                 ex.printStackTrace();
+                sendErrorPage(500, e);
+                return;
             }
             // now we need to parse this yaml(ew)
             Yaml yaml = new Yaml();
@@ -408,6 +414,8 @@ public class Pages {
                 qm.waitFor();
             } catch (Exception ex){
                 ex.printStackTrace();
+                sendErrorPage(500, e);
+                return;
             }
             // im pretty sure at this point we can delete the temp file
             trash.delete();
@@ -418,6 +426,8 @@ public class Pages {
                 qm.waitFor();
             } catch (Exception ex){
                 ex.printStackTrace();
+                sendErrorPage(500, e);
+                return;
             }
             // store the vm id of the vm in the user's oobject or something idk lol
             User u = Database.getUser(getLoggedInUserName(e));
@@ -436,6 +446,8 @@ public class Pages {
                 qm.waitFor();
             } catch (Exception ex){
                 ex.printStackTrace();
+                sendErrorPage(500, e);
+                return;
             }
             // in theory that should be all we need!
             sendErrorPage(588, e);
