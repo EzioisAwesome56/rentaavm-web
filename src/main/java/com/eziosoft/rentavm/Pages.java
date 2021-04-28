@@ -393,7 +393,8 @@ public class Pages {
                 System.err.println(host);
             }
             // next we need to load our "magic" presetup yaml file, and also inject what we need
-            String finalconf = getPageFromResource("/src/base.yaml").replace("{{$HOST$}}", host).replace("{{$USER$}}", username).replace("{{$PW$}}", passhash);
+            String finalconf = getPageFromResource("/src/base.yaml").replace("{{$HOST$}}", host).replace("{{$USER$}}", username).replace("{{$PW$}}", passhash)
+                    .replace("{{$PHONEPORT$}}", Integer.toString(Main.conf.getPhoneport())).replace("{{$PHONEIP$}}", Main.conf.getPhoneip());
             if (Main.debug){
                 System.err.println("Final cloudinit YAML:");
                 System.err.println(finalconf);
@@ -440,7 +441,7 @@ public class Pages {
                 qm = run.exec(cmd);
                 qm.waitFor();
                 // sleep for a few seconds
-                TimeUnit.SECONDS.sleep(5);
+                TimeUnit.SECONDS.sleep(10);
                 // restart the vm (TODO: Figure out why the vm keeps kernel panicing on system boot)
                 cmd = new String[]{"/bin/bash", "-c", "sudo qm reset "+vmid};
                 qm = run.exec(cmd);
