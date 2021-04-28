@@ -12,6 +12,7 @@ public class WebConf {
     private String template;
     private String webip;
     private int phoneport;
+    private String phoneip;
 
     public WebConf(int port, String dbip, int webport){
         this.dbip = dbip;
@@ -55,6 +56,8 @@ public class WebConf {
         return webip;
     }
 
+    public String getPhoneip(){ return phoneip; }
+
     public void createDefaultConfig(){
         this.webport = 6969;
         this.dbport = 28015;
@@ -65,5 +68,6 @@ public class WebConf {
         this.webip = "localhost";
         this.template = "103";
         this.phoneport = 6970;
+        this.phoneip = "127.0.0.1";
     }
 }
