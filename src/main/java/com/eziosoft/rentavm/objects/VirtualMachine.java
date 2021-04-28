@@ -7,15 +7,15 @@ public class VirtualMachine {
     private String ipaddr;
     private int port;
 
-    public VirtualMachine(int id, String owner, String ip, int port){
-        this.vmid = Integer.toString(id);
+    public VirtualMachine(String id, String owner, String ip, int port){
+        this.vmid = id;
         this.owner = owner;
         this.ipaddr = ip;
         this.port = port;
     }
 
-    public int getVmid() {
-        return Integer.parseInt(vmid);
+    public String getVmid() {
+        return vmid;
     }
 
     public int getPort() {

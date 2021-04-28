@@ -112,4 +112,17 @@ public class Database {
     public static void insertVm(VirtualMachine vm){
         r.table(vms).insert(vm).run(thonk);
     }
+
+    public static boolean checkForVM(String hostname){
+        // do cool things here
+        return r.table(vms).getAll(hostname).count().eq(1).run(thonk, boolean.class).first();
+    }
+
+    public static VirtualMachine getVM(String vmid){
+        return gson.fromJson(r.table(vms).get(vmid).toJson().run(thonk, String.class).first(), VirtualMachine.class);
+    }
+
+    public static void updateVM(VirtualMachine vm){
+        r.table(vms).get(vm.getVmid()).update(vm).run(thonk);
+    }
 }

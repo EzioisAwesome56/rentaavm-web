@@ -1,5 +1,6 @@
 package com.eziosoft.rentavm;
 
+import com.eziosoft.rentavm.objects.PhoneClient;
 import com.eziosoft.rentavm.objects.WebConf;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
@@ -7,6 +8,8 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,6 +84,28 @@ public class Main {
         server.setExecutor(null);
         server.start();
         System.out.println("web server started");
+
+        // start initilizing the other listener thread
+        System.out.println("starting up phone home thread");
+        Socket s = null;
+        ServerSocket ss = null;
+        try {
+            ss = new ServerSocket(Main.conf.getPhoneport());
+            while (true){
+                s = ss.accept();
+                if (Main.debug){
+                    System.err.println("Got client phone phone connection!");
+                }
+                // make client
+                PhoneClient c = new PhoneClient(s, new DataInputStream(s.getInputStream()), new DataOutputStream(s.getOutputStream()));
+                // connect
+                c.handle();
+            }
+        } catch (IOException e) {
+            s.close();
+            ss.close();
+            e.printStackTrace();
+        }
     }
 
     public static String getPageFromResource(String name){

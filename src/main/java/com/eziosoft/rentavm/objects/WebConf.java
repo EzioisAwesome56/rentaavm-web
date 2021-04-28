@@ -11,6 +11,7 @@ public class WebConf {
     private int subtract;
     private String template;
     private String webip;
+    private int phoneport;
 
     public WebConf(int port, String dbip, int webport){
         this.dbip = dbip;
@@ -46,6 +47,10 @@ public class WebConf {
         return template;
     }
 
+    public int getPhoneport() {
+        return phoneport;
+    }
+
     public String getWebip() {
         return webip;
     }
@@ -59,5 +64,6 @@ public class WebConf {
         this.subtract = 0;
         this.webip = "localhost";
         this.template = "103";
+        this.phoneport = 6970;
     }
 }

@@ -453,7 +453,7 @@ public class Pages {
             // in theory that should be all we need!
             sendErrorPage(588, e);
             // ok now that the client is out of our hands we have to do one quick thing
-            VirtualMachine vm = new VirtualMachine(vmid, u.getUsername(), "null", 2);
+            VirtualMachine vm = new VirtualMachine(Integer.toString(vmid), u.getUsername(), "null", 2);
             Database.insertVm(vm);
             // and now thats really everything we have to do!
         }
