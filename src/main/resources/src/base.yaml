@@ -3,7 +3,7 @@ package_update: true
 package_upgrade: true
 bootcmd:
  - echo "deb http://deb.debian.org/debian buster contrib" >> /etc/apt/sources.list
- - export DEBIAN_FRONTEND=noninteractivelxtask
+ - export DEBIAN_FRONTEND=noninteractive
 
 user: patchyvm
 password: $5$Yh6uZKqj$j9ehRCkuQqcXWa.ZuS6D4lUpBZu/.ptoN0dC4KA8l4B
