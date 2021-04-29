@@ -53,5 +53,5 @@ write_files:
     path: /etc/phone.jar
 
 power_state:
-  - mode: reboot
-  - message: Its gamer time
+  mode: reboot
+  message: Its gamer time
